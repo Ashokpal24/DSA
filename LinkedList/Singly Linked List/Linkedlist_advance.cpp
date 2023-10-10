@@ -6,8 +6,7 @@ public:
   int data;
   Node *next;
 };
-
-// passing pointer as reference
+// passing pointer as value normally
 void visualize(Node *head_ref) {
   cout << "current address of head:" << head_ref << endl;
 
@@ -23,6 +22,7 @@ void visualize(Node *head_ref) {
   cout << endl;
 }
 
+// passing pointer as reference
 void insertAtBeginning(Node *&head_ref, int value) {
   Node *newNode = new Node();
   newNode->data = value;
