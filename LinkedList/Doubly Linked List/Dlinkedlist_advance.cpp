@@ -29,6 +29,10 @@ public:
     void insertInBetween(Node *head_ref, int value, int afterValue);
     // passing by value
     void insertAtEnd(Node *head_ref, int value);
+
+    void deleteAtBeginning(Node *&head_ref);
+
+    void deleteAtPostion(Node *head_ref, int position);
 };
 
 void DLinkedList::initiateDLinkedList()
@@ -110,6 +114,8 @@ void DLinkedList::insertInBetween(Node *head_ref, int value, int afterValue)
         else
         {
             newNode->next = head_ref->next;
+            newNode->next->prev = newNode;
+
             newNode->prev = head_ref;
             head_ref->next = newNode;
             break;
@@ -130,6 +136,47 @@ void DLinkedList::insertAtEnd(Node *head_ref, int value)
     newNode->prev = head_ref;
 }
 // add programiz implementation here
+void DLinkedList::deleteAtBeginning(Node *&head_ref)
+{
+    Node *deleteNode = NULL;
+    if (head_ref->next != NULL)
+    {
+        deleteNode = head_ref;
+        head_ref = deleteNode->next;
+        head_ref->prev = NULL;
+        // moving forward
+    }
+    free(deleteNode);
+}
+
+void DLinkedList::deleteAtPostion(Node *head_ref, int position)
+{
+    Node *deleteNode = NULL;
+    for (int i = 0; i != position; i++)
+    {
+        if (head_ref->next != NULL)
+        {
+            head_ref = head_ref->next;
+        }
+        else
+        {
+            cout << "Invalid position" << endl;
+            cout << endl;
+            return;
+        }
+    }
+    deleteNode = head_ref;
+    // correcting next node
+    if (deleteNode->next != NULL)
+    {
+        deleteNode->next->prev = deleteNode->prev;
+    }
+    if (deleteNode->prev != NULL)
+    {
+        deleteNode->prev->next = deleteNode->next;
+    }
+    free(deleteNode);
+}
 
 int main()
 {
@@ -144,5 +191,8 @@ int main()
     newObj.insertAtBeginning(newObj.head, 7000);
     newObj.insertAtEnd(newObj.head, 700);
     newObj.insertAtEnd(newObj.head, 50);
+    newObj.visualize(newObj.head);
+    newObj.deleteAtPostion(newObj.head, 4);
+    newObj.deleteAtBeginning(newObj.head);
     newObj.visualize(newObj.head);
 }
