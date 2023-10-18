@@ -140,10 +140,9 @@ void DLinkedList::insertAtEnd(Node *head_ref, int value)
 // add programiz implementation here
 void DLinkedList::deleteAtBeginning(Node *&head_ref)
 {
-    Node *deleteNode = NULL;
+    Node *deleteNode = head_ref;
     if (head_ref->next != NULL)
     {
-        deleteNode = head_ref;
         head_ref = deleteNode->next;
         head_ref->prev = NULL;
         // moving forward
