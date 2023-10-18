@@ -33,6 +33,8 @@ public:
     void deleteAtBeginning(Node *&head_ref);
 
     void deleteAtPostion(Node *head_ref, int position);
+
+    void deleteAtEnd(Node *head_ref);
 };
 
 void DLinkedList::initiateDLinkedList()
@@ -178,6 +180,19 @@ void DLinkedList::deleteAtPostion(Node *head_ref, int position)
     free(deleteNode);
 }
 
+void DLinkedList::deleteAtEnd(Node *head_ref)
+{
+    while (head_ref->next != NULL)
+    {
+        head_ref = head_ref->next;
+    }
+    if (head_ref->prev != NULL)
+    {
+        head_ref->prev->next = NULL;
+    }
+    free(head_ref);
+}
+
 int main()
 {
     DLinkedList newObj;
@@ -194,5 +209,8 @@ int main()
     newObj.visualize(newObj.head);
     newObj.deleteAtPostion(newObj.head, 4);
     newObj.deleteAtBeginning(newObj.head);
+    newObj.deleteAtEnd(newObj.head);
+    newObj.visualize(newObj.head);
+    newObj.deleteAtEnd(newObj.head);
     newObj.visualize(newObj.head);
 }
