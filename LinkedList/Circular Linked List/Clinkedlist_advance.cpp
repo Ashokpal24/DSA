@@ -8,9 +8,15 @@ public:
     int data;
     Node *next;
 };
+
 // passing pointer as value normally
 void visualize(Node *head_ref)
 {
+    if (head_ref == NULL)
+    {
+        cout << "Empty circular Linked list" << endl;
+        return;
+    }
     cout << "current address of head:" << head_ref << endl;
     Node *startNode = head_ref;
     int counter = 0;
@@ -51,7 +57,7 @@ void insertAtBeginning(Node *&head_ref, int value)
     newNode->data = value;
     newNode->next = head_ref;
     head_ref = newNode;
-    
+
     // debugging print
     cout << "NEW Adding at beginning"
          << ": [ Address :" << head_ref
@@ -66,7 +72,7 @@ void insertAtBeginning(Node *&head_ref, int value)
     {
         tempNode = tempNode->next;
     } while (tempNode->next != head_ref->next);
-    // when reached the end Node,point the next field to head node i.e newNode
+
     tempNode->next = newNode;
 }
 
@@ -90,14 +96,19 @@ void insertAtEnd(Node *head_ref, int value)
         head_ref = head_ref->next;
 
     } while (head_ref->next != startNode);
+
     head_ref->next = newNode;
 }
 
 void insertAtPosition(Node *&head_ref, int value, int position)
 {
-    // create a variable to store the head node
-    // create a new Node to be added
-    Node *tempNode = head_ref;
+    if (position > getLength(head_ref))
+    {
+        cout << "The position is not valid for insertion" << endl;
+        cout << endl;
+        return;
+    }
+
     Node *newNode = new Node();
     newNode->data = value;
 
@@ -118,46 +129,84 @@ void insertAtPosition(Node *&head_ref, int value, int position)
     }
     else
     {
+        Node *tempNode = head_ref;
+
         for (int i = 0; i < position - 1; i++)
         {
-            // if the next field points to head node stop.
-            if (tempNode->next != head_ref)
-            {
-                tempNode = tempNode->next;
-            }
-            else
-            {
-                cout << "The position is not valid for insertion" << endl;
-                cout << endl;
-                return;
-            }
+
+            tempNode = tempNode->next;
         }
+
         newNode->next = tempNode->next;
         tempNode->next = newNode;
     }
 }
 
-void deleteAtPosition(Node *head_ref, int position)
+void deleteAtBeginning(Node *&head_ref)
 {
-    Node *startNode = head_ref;
-    Node *prev = NULL;
+    cout << "Deletion at beginning" << endl;
 
-    for (int i = 0; i < position; i++)
+    Node *delNode = head_ref;
+    Node *tempNode = head_ref;
+    head_ref = head_ref->next;
+
+    do
     {
-        if (head_ref != startNode)
-        {
-            prev = head_ref;
-            head_ref = head_ref->next;
-        }
-        else
-        {
-            cout << "The position is not valid for deletion" << endl;
-            cout << endl;
-            return;
-        }
+        tempNode = tempNode->next;
+    } while (tempNode->next != delNode);
+
+    tempNode->next = head_ref;
+
+    free(delNode);
+}
+
+void deleteAtEnd(Node *head_ref)
+{
+    cout << "Deletion at end" << endl;
+
+    Node *startNode = head_ref;
+    do
+    {
+        head_ref = head_ref->next;
+
+    } while (head_ref->next->next != startNode);
+
+    Node *delNode = head_ref->next;
+    head_ref->next = startNode;
+
+    free(delNode);
+}
+
+void deleteAtPosition(Node *&head_ref, int position)
+{
+    if (position > getLength(head_ref))
+    {
+        cout << "The position is not valid for deletion" << endl;
+        cout << endl;
+        return;
     }
-    prev->next = head_ref->next;
-    free(head_ref);
+
+    if (position == 0)
+    {
+        deleteAtBeginning(head_ref);
+    }
+    else if (getLength(head_ref) + 1 == position)
+    {
+        deleteAtEnd(head_ref);
+    }
+    else
+    {
+
+        Node *tempNode = head_ref;
+        for (int i = 0; i < position - 1; i++)
+        {
+            tempNode = tempNode->next;
+        }
+
+        Node *delNode = tempNode->next;
+        tempNode->next = tempNode->next->next;
+        free(delNode);
+    }
 }
 
 void deleteAtValue(Node *head_ref, int Value)
@@ -215,19 +264,13 @@ int main()
     insertAtPosition(head, 300, 4);
     insertAtPosition(head, 1000, 0);
     visualize(head);
-    // deleteAtPosition(head, 2);
-
-    // insertAtPosition(head, 1000, 8); // invalid
-    // visualize(head);
-    // deleteAtPosition(head, 2);
-    // deleteAtPosition(head, 100); // invalid
-    // // visualize(head);
-    // deleteAtValue(head, 3);
-    // // visualize(head);
-    // deleteAtValue(head, 3);   // invalid
-    // deleteAtValue(head, 400); // invalid
-    // cout << searchNode(head, 1) << endl;
-    // cout << searchNode(head, 400) << endl;
-    // sortLinkedList(head);
-    // visualize(head);
+    deleteAtEnd(head);
+    deleteAtBeginning(head);
+    deleteAtPosition(head, 2);
+    visualize(head);
+    deleteAtPosition(head, 0);
+    deleteAtPosition(head, 1);
+    deleteAtPosition(head, 0);
+    deleteAtPosition(head, 0);
+    visualize(head);
 }
