@@ -144,41 +144,72 @@ void insertAtPosition(Node *&head_ref, int value, int position)
 
 void deleteAtBeginning(Node *&head_ref)
 {
+    if (head_ref == NULL)
+    {
+        cout << "Empty circular Linked list" << endl;
+        return;
+    }
     cout << "Deletion at beginning" << endl;
 
     Node *delNode = head_ref;
     Node *tempNode = head_ref;
     head_ref = head_ref->next;
-
-    do
+    if (getLength(head_ref) != 1)
     {
-        tempNode = tempNode->next;
-    } while (tempNode->next != delNode);
+        do
+        {
+            tempNode = tempNode->next;
+        } while (tempNode->next != delNode);
 
-    tempNode->next = head_ref;
-
-    free(delNode);
+        tempNode->next = head_ref;
+        free(delNode);
+    }
+    else
+    {
+        head_ref = NULL;
+        free(delNode);
+    }
 }
 
-void deleteAtEnd(Node *head_ref)
+void deleteAtEnd(Node *&head_ref)
 {
+    if (head_ref == NULL)
+    {
+        cout << "Empty circular Linked list" << endl;
+        return;
+    }
+
     cout << "Deletion at end" << endl;
 
-    Node *startNode = head_ref;
-    do
+    Node *tempNode = head_ref;
+    Node *delNode = NULL;
+
+    if (getLength(head_ref) != 1)
     {
-        head_ref = head_ref->next;
+        do
+        {
+            tempNode = tempNode->next;
 
-    } while (head_ref->next->next != startNode);
-
-    Node *delNode = head_ref->next;
-    head_ref->next = startNode;
-
-    free(delNode);
+        } while (tempNode->next->next != head_ref);
+        delNode = tempNode->next;
+        tempNode->next = head_ref;
+        free(delNode);
+    }
+    else
+    {
+        delNode = head_ref;
+        head_ref = NULL;
+        free(delNode);
+    }
 }
 
 void deleteAtPosition(Node *&head_ref, int position)
 {
+    if (head_ref == NULL)
+    {
+        cout << "Empty circular Linked list" << endl;
+        return;
+    }
     if (position > getLength(head_ref))
     {
         cout << "The position is not valid for deletion" << endl;
@@ -202,7 +233,6 @@ void deleteAtPosition(Node *&head_ref, int position)
         {
             tempNode = tempNode->next;
         }
-
         Node *delNode = tempNode->next;
         tempNode->next = tempNode->next->next;
         free(delNode);
@@ -270,6 +300,7 @@ int main()
     visualize(head);
     deleteAtPosition(head, 0);
     deleteAtPosition(head, 1);
+    visualize(head);
     deleteAtPosition(head, 0);
     deleteAtPosition(head, 0);
     visualize(head);
