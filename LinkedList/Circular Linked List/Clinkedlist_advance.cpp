@@ -30,16 +30,28 @@ void visualize(Node *head_ref)
     cout << endl;
 }
 
+int getLength(Node *head_ref)
+{
+    int count = 0;
+    Node *startNode = head_ref;
+    do
+    {
+        head_ref = head_ref->next;
+        count += 1;
+
+    } while (head_ref->next != startNode);
+    return count;
+}
+
 // passing pointer as reference
 void insertAtBeginning(Node *&head_ref, int value)
 {
-    // create a new head Node
-    // update the data and point the next field to current head Node
-    // set newNode as head Node
+
     Node *newNode = new Node();
     newNode->data = value;
     newNode->next = head_ref;
     head_ref = newNode;
+    
     // debugging print
     cout << "NEW Adding at beginning"
          << ": [ Address :" << head_ref
@@ -47,7 +59,7 @@ void insertAtBeginning(Node *&head_ref, int value)
          << " | next value :" << head_ref->next->data << "]" << endl;
 
     cout << endl;
-    // instance a new node to iterate
+
     Node *tempNode = head_ref->next;
 
     do
@@ -81,44 +93,48 @@ void insertAtEnd(Node *head_ref, int value)
     head_ref->next = newNode;
 }
 
-void insertAtPosition(Node *head_ref, int value, int position)
+void insertAtPosition(Node *&head_ref, int value, int position)
 {
     // create a variable to store the head node
     // create a new Node to be added
-    Node *startNode = head_ref;
+    Node *tempNode = head_ref;
     Node *newNode = new Node();
     newNode->data = value;
+
     // debugging print
     cout << "Position: " << position << endl;
-    cout << "NEW Adding at end"
+    cout << "NEW Adding at above position"
          << ": [ Address :" << newNode
          << " | value : " << newNode->data << endl;
     cout << endl;
-    // TODO->>>>
-    //  check if the position is at end or start
-    //  Also add logic for that
 
-    // iterate to reach the position
-
-    // check if the position is at end or start
-    // Also add logic for that
-
-    for (int i = 0; i < position - 1; i++)
+    if (position == 0)
     {
-        // if the next field points to head node stop.
-        if (head_ref->next != startNode)
-        {
-            head_ref = head_ref->next;
-        }
-        else
-        {
-            cout << "The position is not valid for insertion" << endl;
-            cout << endl;
-            return;
-        }
+        insertAtBeginning(head_ref, value);
     }
-    newNode->next = head_ref->next;
-    head_ref->next = newNode;
+    else if (getLength(head_ref) + 1 == position)
+    {
+        insertAtEnd(head_ref, value);
+    }
+    else
+    {
+        for (int i = 0; i < position - 1; i++)
+        {
+            // if the next field points to head node stop.
+            if (tempNode->next != head_ref)
+            {
+                tempNode = tempNode->next;
+            }
+            else
+            {
+                cout << "The position is not valid for insertion" << endl;
+                cout << endl;
+                return;
+            }
+        }
+        newNode->next = tempNode->next;
+        tempNode->next = newNode;
+    }
 }
 
 void deleteAtPosition(Node *head_ref, int position)
