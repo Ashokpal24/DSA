@@ -38,6 +38,9 @@ void visualize(Node *head_ref)
 
 int getLength(Node *head_ref)
 {
+    if (head_ref == NULL)
+        return 0;
+
     int count = 0;
     Node *startNode = head_ref;
     do
@@ -84,28 +87,36 @@ void insertAtBeginning(Node *&head_ref, int value)
     }
 }
 
-void insertAtEnd(Node *head_ref, int value)
+void insertAtEnd(Node *&head_ref, int value)
 {
-    Node *startNode = head_ref;
-    Node *newNode = new Node();
-    newNode->data = value;
-    newNode->next = startNode;
-
-    // debugging print
-    cout << "NEW Adding at end"
-         << ": [ Address :" << newNode
-         << " | value : " << newNode->data
-         << " | next value :" << newNode->next->data << "]" << endl;
-
-    cout << endl;
-
-    do
+    if (head_ref != NULL)
     {
-        head_ref = head_ref->next;
+        Node *newNode = new Node();
+        newNode->data = value;
+        newNode->next = head_ref;
 
-    } while (head_ref->next != startNode);
+        // debugging print
+        cout << "NEW Adding at end"
+             << ": [ Address :" << newNode
+             << " | value : " << newNode->data
+             << " | next value :" << newNode->next->data << "]" << endl;
 
-    head_ref->next = newNode;
+        cout << endl;
+
+        Node *tempNode = head_ref;
+
+        do
+        {
+            tempNode = tempNode->next;
+
+        } while (tempNode->next != head_ref);
+
+        tempNode->next = newNode;
+    }
+    else
+    {
+        insertAtBeginning(head_ref, value);
+    }
 }
 
 void insertAtPosition(Node *&head_ref, int value, int position)
@@ -312,8 +323,8 @@ int main()
     deleteAtPosition(head, 0);
     deleteAtPosition(head, 0);
     visualize(head);
+    insertAtPosition(head, 1000, 0);
     insertAtBeginning(head, 70);
-    visualize(head);
     insertAtBeginning(head, 69);
     visualize(head);
 }
