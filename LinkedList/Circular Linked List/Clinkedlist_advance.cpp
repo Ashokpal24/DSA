@@ -58,22 +58,30 @@ void insertAtBeginning(Node *&head_ref, int value)
     newNode->next = head_ref;
     head_ref = newNode;
 
+    Node *tempNode = NULL;
     // debugging print
-    cout << "NEW Adding at beginning"
-         << ": [ Address :" << head_ref
-         << " | value : " << head_ref->data
-         << " | next value :" << head_ref->next->data << "]" << endl;
-
-    cout << endl;
-
-    Node *tempNode = head_ref->next;
-
-    do
+    cout << "brr" << endl;
+    if (newNode->next != NULL)
     {
-        tempNode = tempNode->next;
-    } while (tempNode->next != head_ref->next);
+        cout << "NEW Adding at beginning"
+             << ": [ Address :" << head_ref
+             << " | value : " << head_ref->data
+             << " | next value :" << head_ref->next->data << "]" << endl;
 
-    tempNode->next = newNode;
+        cout << endl;
+        tempNode = head_ref->next;
+
+        do
+        {
+            tempNode = tempNode->next;
+        } while (tempNode->next != head_ref->next);
+
+        tempNode->next = newNode;
+    }
+    else
+    {
+        head_ref->next = newNode;
+    }
 }
 
 void insertAtEnd(Node *head_ref, int value)
@@ -303,5 +311,9 @@ int main()
     visualize(head);
     deleteAtPosition(head, 0);
     deleteAtPosition(head, 0);
+    visualize(head);
+    insertAtBeginning(head, 70);
+    visualize(head);
+    insertAtBeginning(head, 69);
     visualize(head);
 }
