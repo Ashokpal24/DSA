@@ -24,7 +24,7 @@ struct Node
     Node *child;
     Node *next;
     Node *prev;
-    Node(int k) : key(k), degree(0), marked(false), parent(nullptr), child(NULL), next(this), prev(this) {}
+    Node(int k) : key(k), degree(0), marked(false), parent(nullptr), child(nullptr), next(this), prev(this) {}
 };
 class FibonacciHeap
 {
@@ -32,45 +32,93 @@ public:
     Node *minNode;
     int numNodes;
     FibonacciHeap() : minNode(nullptr), numNodes(0) {}
-    void insert(int key)
+    void insert(int key);
+    Node *extractMin();
+    void consolidate();
+    void link();
+    void visualize();
+};
+
+void FibonacciHeap::insert(int key)
+{
+    Node *newNode = new Node(key);
+    if (minNode == nullptr)
     {
-        Node *newNode = new Node(key);
-        if (minNode == nullptr)
+        minNode = newNode; // 1
+    }
+    else
+    {
+        newNode->next = minNode->next;
+        // 2 next = 1 next (.i.e 1) | 3 next = 1 next (i.e 2)
+        newNode->prev = minNode;
+        // 2 prev = 1 | 3 prev = 1
+        minNode->next->prev = newNode;
+        // 1 next (.i.e 1) prev (.i.e 1) = 2 | 1 next 2 prev = 3
+        minNode->next = newNode;
+        // 1 next = 2 | 1 next 3
+        if (key < minNode->key)
         {
-            minNode = newNode; // 1
+            minNode = newNode;
+        }
+    }
+    numNodes++;
+}
+
+Node *FibonacciHeap::extractMin()
+{
+    Node *rmMin = minNode;
+    if (rmMin != nullptr)
+    {
+        if (rmMin->next == rmMin)
+        {
+            minNode = nullptr;
         }
         else
         {
-            newNode->next = minNode->next; 
-            // 2 next = 1 next (.i.e 1) | 3 next = 1 next (i.e 2)
-            newNode->prev = minNode;       
-            // 2 prev = 1 | 3 prev = 1
-            minNode->next->prev = newNode; 
-            // 1 next (.i.e 1) prev (.i.e 1) = 2 | 1 next 2 prev = 3
-            minNode->next = newNode;       
-            // 1 next = 2 | 1 next 3
-            if (key < minNode->key)
-            {
-                minNode = newNode;
-            }
+            rmMin->next->prev = rmMin->prev;
+            rmMin->prev->next = rmMin->next;
+            minNode = rmMin->next;
         }
-        numNodes++;
-    }
-
-    void visualize()
-    {
-        Node *tempNode = minNode;
-        do
+        if (rmMin->child != nullptr)
         {
-            cout << "Value->" << tempNode->key << endl;
-            cout << "current address->" << tempNode << endl;
-            cout << "Previous->" << tempNode->prev << endl;
-            cout << "Next->" << tempNode->next << endl;
-            cout << endl;
-            tempNode = tempNode->next;
-        } while (tempNode != minNode);
+            Node *child = rmMin->child;
+            Node *originalChild = child;
+            do
+            {
+                Node *nextChild = child->next;
+                child->prev = minNode;
+                child->next = minNode->next;
+                minNode->next->prev = child;
+                minNode->next = child;
+                child->marked = false;
+                child->parent = nullptr;
+                child = nextChild;
+
+            } while (child != originalChild);
+        }
+        consolidate();
+        numNodes--;
     }
-};
+    return rmMin;
+}
+void consolidate(){
+    
+}
+
+void FibonacciHeap::visualize()
+{
+    Node *tempNode = minNode;
+    do
+    {
+        cout << "Value->" << tempNode->key << endl;
+        cout << "current address->" << tempNode << endl;
+        cout << "Previous->" << tempNode->prev << endl;
+        cout << "Next->" << tempNode->next << endl;
+        cout << endl;
+        tempNode = tempNode->next;
+    } while (tempNode != minNode);
+}
+
 int main()
 {
     FibonacciHeap fibHeap;
