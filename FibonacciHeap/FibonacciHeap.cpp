@@ -39,7 +39,8 @@ public:
     Node *extractMin();
     void consolidate();
     void link(Node *y, Node *x);
-    void visualize();
+    void visualize(Node *tempNode);
+    void printChild(Node *tempNode);
 };
 
 void FibonacciHeap::insert(int key)
@@ -152,11 +153,11 @@ void FibonacciHeap::consolidate()
 
     } while (flag);
 
-    for (Node *node : toRemove)
-    {
-        node->prev->next = node->next;
-        node->next->prev = node->prev;
-    }
+    // for (Node *node : toRemove)
+    // {
+    //     node->prev->next = node->next;
+    //     node->next->prev = node->prev;
+    // }
 
     minNode = nullptr;
     for (Node *node : degreeTable)
@@ -194,9 +195,15 @@ void FibonacciHeap::link(Node *y, Node *x)
     y->marked = false;
 }
 
-void FibonacciHeap::visualize()
+// TODO update the visual logic
+//  current child are not being printed, need a recursive
+
+void FibonacciHeap::visualize(Node *tempNode = nullptr)
+
 {
-    Node *tempNode = minNode;
+    if (tempNode == nullptr)
+        tempNode = minNode;
+
     if (minNode != nullptr)
     {
         do
@@ -207,12 +214,32 @@ void FibonacciHeap::visualize()
             cout << "Next->" << tempNode->next << endl;
             cout << endl;
             tempNode = tempNode->next;
+            if (tempNode->child != nullptr)
+                printChild(tempNode->child);
         } while (tempNode != minNode);
     }
     else
     {
         cout << "empty" << endl;
     }
+}
+
+void FibonacciHeap::printChild(Node *tempNode)
+
+{
+    Node *startNode = tempNode;
+    cout << "Child are as follows" << endl;
+    do
+    {
+        cout << "Value->" << tempNode->key << endl;
+        cout << "current address->" << tempNode << endl;
+        cout << "Previous->" << tempNode->prev << endl;
+        cout << "Next->" << tempNode->next << endl;
+        cout << endl;
+        if (tempNode->child != nullptr)
+            printChild(tempNode->child);
+        tempNode = tempNode->next;
+    } while (tempNode != startNode);
 }
 
 int main()
@@ -224,8 +251,6 @@ int main()
     fibHeap.insert(8);
     fibHeap.insert(49);
     fibHeap.insert(79);
-
-    fibHeap.visualize();
 
     Node *minN = fibHeap.extractMin();
     if (minN != nullptr)
