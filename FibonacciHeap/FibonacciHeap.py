@@ -51,7 +51,7 @@ class FibonacciHeap:
 
     def consolidate(self):
         aux = (floor_log(self.count) + 1) * [None]
-
+        print(aux)
         while self.trees:
             tree_1 = self.trees[0]
             order = tree_1.order
