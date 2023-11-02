@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 struct Node
@@ -28,14 +29,16 @@ struct Node
 };
 class FibonacciHeap
 {
-public:
+private:
     Node *minNode;
     int numNodes;
+
+public:
     FibonacciHeap() : minNode(nullptr), numNodes(0) {}
     void insert(int key);
     Node *extractMin();
     void consolidate();
-    void link();
+    void link(Node *y, Node *x);
     void visualize();
 };
 
@@ -79,6 +82,7 @@ Node *FibonacciHeap::extractMin()
             rmMin->prev->next = rmMin->next;
             minNode = rmMin->next;
         }
+
         if (rmMin->child != nullptr)
         {
             Node *child = rmMin->child;
@@ -101,22 +105,114 @@ Node *FibonacciHeap::extractMin()
     }
     return rmMin;
 }
-void consolidate(){
-    
+
+// Consolidate the heap to ensure there is at most one tree of each degree
+void FibonacciHeap::consolidate()
+{
+    // Calculate the maximum degree in the heap
+    int maxDegree = static_cast<int>(log2(numNodes));
+    vector<Node *> degreeTable(maxDegree + 1, nullptr);
+
+    Node *currentNode = minNode;
+    vector<Node *> toRemove;
+
+    bool flag = true;
+
+    do
+    {
+        Node *x = currentNode;
+        int degree = x->degree;
+
+        while (degreeTable[degree] != nullptr)
+        {
+            Node *y = degreeTable[degree];
+            if (x != y)
+            {
+                if (x->key > y->key)
+                {
+                    swap(x, y);
+                }
+
+                // make y the child of x
+
+                link(y, x);
+                degreeTable[degree] = nullptr;
+                degree++;
+            }
+            else
+            {
+                flag = false;
+                degreeTable[degree] = nullptr;
+            }
+        }
+
+        degreeTable[degree] = x;
+        toRemove.push_back(currentNode);
+        currentNode = currentNode->next;
+
+    } while (flag);
+
+    for (Node *node : toRemove)
+    {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+
+    minNode = nullptr;
+    for (Node *node : degreeTable)
+    {
+        if (node != nullptr)
+        {
+            if (minNode == nullptr || node->key < minNode->key)
+            {
+                minNode = node;
+            }
+        }
+    }
+}
+
+void FibonacciHeap::link(Node *y, Node *x)
+{
+    y->prev->next = y->next;
+    y->next->prev = y->prev;
+
+    y->prev = y;
+    y->next = y;
+
+    if (x->child == nullptr)
+    {
+        x->child = y;
+    }
+    else
+    {
+        y->next = x->child->next;
+        y->prev = x->child;
+        x->child->next->prev = y;
+        x->child->next = y;
+    }
+    x->degree++;
+    y->marked = false;
 }
 
 void FibonacciHeap::visualize()
 {
     Node *tempNode = minNode;
-    do
+    if (minNode != nullptr)
     {
-        cout << "Value->" << tempNode->key << endl;
-        cout << "current address->" << tempNode << endl;
-        cout << "Previous->" << tempNode->prev << endl;
-        cout << "Next->" << tempNode->next << endl;
-        cout << endl;
-        tempNode = tempNode->next;
-    } while (tempNode != minNode);
+        do
+        {
+            cout << "Value->" << tempNode->key << endl;
+            cout << "current address->" << tempNode << endl;
+            cout << "Previous->" << tempNode->prev << endl;
+            cout << "Next->" << tempNode->next << endl;
+            cout << endl;
+            tempNode = tempNode->next;
+        } while (tempNode != minNode);
+    }
+    else
+    {
+        cout << "empty" << endl;
+    }
 }
 
 int main()
@@ -126,6 +222,19 @@ int main()
     fibHeap.insert(5);
     fibHeap.insert(3);
     fibHeap.insert(8);
+    fibHeap.insert(49);
+    fibHeap.insert(79);
+
     fibHeap.visualize();
+
+    Node *minN = fibHeap.extractMin();
+    if (minN != nullptr)
+    {
+        cout << "Min: " << minN->key << endl;
+        delete minN;
+    }
+
+    fibHeap.visualize();
+
     return 0;
 }
