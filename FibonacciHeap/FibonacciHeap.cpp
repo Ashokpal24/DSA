@@ -29,20 +29,23 @@ struct Node
 };
 class FibonacciHeap
 {
-private:
-    Node *minNode;
-    int numNodes;
-
 public:
+    Node *minNode;
+
     FibonacciHeap() : minNode(nullptr), numNodes(0) {}
     void insert(int key);
     Node *extractMin();
     void unionFibonacciHeap(FibonacciHeap &other);
+    void decreaseKey(Node *node, int newkey);
+    void deleteNode(Node *node);
     void visualize(Node *tempNode);
 
 private:
+    int numNodes;
     void consolidate();
     void link(Node *y, Node *x);
+    void cut(Node *x_child, Node *y_parent);
+    void cascadingCut(Node *y_parent);
     void printChild(Node *tempNode);
 };
 
@@ -109,6 +112,7 @@ Node *FibonacciHeap::extractMin()
     }
     return rmMin;
 }
+
 void FibonacciHeap::unionFibonacciHeap(FibonacciHeap &other)
 {
     if (other.minNode == nullptr)
@@ -147,6 +151,34 @@ void FibonacciHeap::unionFibonacciHeap(FibonacciHeap &other)
         other.minNode = nullptr;
     }
 }
+
+void FibonacciHeap::decreaseKey(Node *node, int newkey)
+{
+    if (newkey > node->key)
+    {
+        cerr << "New key is greater than the current key." << endl;
+        return;
+    }
+    node->key = newkey;
+    Node *parent = node->parent;
+
+    if (parent != nullptr && node->key < parent->key)
+    {
+        cut(node, parent);
+        cascadingCut(parent);
+    }
+
+    if (node->key < minNode->key)
+    {
+        minNode = node;
+    }
+}
+
+void FibonacciHeap::deleteNode(Node *node)
+{
+    decreaseKey(node, numeric_limits<int>::min());
+    extractMin();
+}
 // Consolidate the heap to ensure there is at most one tree of each degree
 void FibonacciHeap::consolidate()
 {
@@ -155,7 +187,6 @@ void FibonacciHeap::consolidate()
     vector<Node *> degreeTable(maxDegree + 1, nullptr);
 
     Node *currentNode = minNode;
-    // vector<Node *> toRemove;
 
     bool flag = true;
 
@@ -188,16 +219,9 @@ void FibonacciHeap::consolidate()
         }
 
         degreeTable[degree] = x;
-        // toRemove.push_back(currentNode);
         currentNode = currentNode->next;
 
     } while (flag);
-
-    // for (Node *node : toRemove)
-    // {
-    //     node->prev->next = node->next;
-    //     node->next->prev = node->prev;
-    // }
 
     minNode = nullptr;
     for (Node *node : degreeTable)
@@ -219,6 +243,7 @@ void FibonacciHeap::link(Node *y, Node *x)
 
     y->prev = y;
     y->next = y;
+    y->parent = x;
 
     if (x->child == nullptr)
     {
@@ -233,6 +258,48 @@ void FibonacciHeap::link(Node *y, Node *x)
     }
     x->degree++;
     y->marked = false;
+}
+
+void FibonacciHeap::cut(Node *x_child, Node *y_parent)
+{
+    if (x_child == x_child)
+    {
+        y_parent->child = nullptr;
+    }
+    else
+    {
+        x_child->next->prev = x_child->prev;
+        x_child->prev->next = x_child->next;
+        if (y_parent->child == x_child)
+        {
+            y_parent->child = x_child->next;
+        }
+    }
+
+    y_parent->degree--;
+    x_child->prev = minNode;
+    x_child->next = minNode->next;
+    minNode->next->prev = x_child;
+    minNode->next = x_child;
+    x_child->parent = nullptr;
+    x_child->marked = false;
+}
+
+void FibonacciHeap::cascadingCut(Node *y_parent)
+{
+    Node *tempNode = y_parent->parent;
+    if (tempNode != nullptr)
+    {
+        if (!tempNode->marked)
+        {
+            tempNode->marked = true;
+        }
+        else
+        {
+            cut(y_parent, tempNode);
+            cascadingCut(tempNode);
+        }
+    }
 }
 
 // TODO update the visual logic
@@ -308,7 +375,6 @@ int main()
     cout << endl;
     fibHeap1.visualize();
 
-
     fibHeap2.insert(10);
     fibHeap2.insert(7);
     fibHeap2.insert(310);
@@ -324,7 +390,31 @@ int main()
     cout << endl;
 
     fibHeap1.unionFibonacciHeap(fibHeap2);
-    fibHeap1.visualize();
+    // fibHeap1.visualize();
+
+    Node *nodeToDecrease = fibHeap1.minNode;
+    if (nodeToDecrease != nullptr)
+    {
+        fibHeap1.decreaseKey(nodeToDecrease, 2);
+        cout << "Decreased Key: " << nodeToDecrease->key << endl;
+    }
+
+    // Test Deletion
+    Node *nodeToDelete = fibHeap1.minNode;
+    if (nodeToDelete != nullptr)
+    {
+        fibHeap1.deleteNode(nodeToDelete);
+        cout << "Deleted Node: " << nodeToDelete->key << endl;
+        delete nodeToDelete;
+    }
+
+    // Extract the minimum node after deletion
+    Node *minNode = fibHeap1.extractMin();
+    if (minNode != nullptr)
+    {
+        cout << "New Min Node: " << minNode->key << endl;
+        delete minNode;
+    }
 
     return 0;
 }
