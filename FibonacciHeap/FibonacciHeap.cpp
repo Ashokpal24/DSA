@@ -6,8 +6,8 @@
 
 // operations
 // 1.Insertion
-// 2.Union
-// 3.Extracting min
+// 2.Extracting min
+// 3.Union
 // 4.Decrease Key
 // 5.Deletion
 
@@ -37,9 +37,12 @@ public:
     FibonacciHeap() : minNode(nullptr), numNodes(0) {}
     void insert(int key);
     Node *extractMin();
+    void unionFibonacciHeap(FibonacciHeap &other);
+    void visualize(Node *tempNode);
+
+private:
     void consolidate();
     void link(Node *y, Node *x);
-    void visualize(Node *tempNode);
     void printChild(Node *tempNode);
 };
 
@@ -106,7 +109,44 @@ Node *FibonacciHeap::extractMin()
     }
     return rmMin;
 }
+void FibonacciHeap::unionFibonacciHeap(FibonacciHeap &other)
+{
+    if (other.minNode == nullptr)
+        return;
+    if (minNode == nullptr)
+    {
+        minNode = other.minNode;
+    }
+    else
+    {
+        Node *thisMin = minNode;
+        Node *otherMin = other.minNode;
 
+        Node *thisNext = thisMin->next;
+        Node *otherPrev = otherMin->prev;
+
+        // a->next=b
+        // b->prev=a
+        thisMin->next = otherMin;
+        otherMin->prev = thisMin;
+
+        // a->next->prev=b->prev
+        // b->prev->next=a->next
+        thisNext->prev = otherPrev;
+        otherPrev->next = thisNext;
+
+        // a<->c  b<->d
+        // a<->b<->d<->c
+
+        if (otherMin->key < minNode->key)
+        {
+            minNode = otherMin;
+        }
+        numNodes += other.numNodes;
+        other.numNodes = 0;
+        other.minNode = nullptr;
+    }
+}
 // Consolidate the heap to ensure there is at most one tree of each degree
 void FibonacciHeap::consolidate()
 {
@@ -115,7 +155,7 @@ void FibonacciHeap::consolidate()
     vector<Node *> degreeTable(maxDegree + 1, nullptr);
 
     Node *currentNode = minNode;
-    vector<Node *> toRemove;
+    // vector<Node *> toRemove;
 
     bool flag = true;
 
@@ -148,7 +188,7 @@ void FibonacciHeap::consolidate()
         }
 
         degreeTable[degree] = x;
-        toRemove.push_back(currentNode);
+        // toRemove.push_back(currentNode);
         currentNode = currentNode->next;
 
     } while (flag);
@@ -206,16 +246,18 @@ void FibonacciHeap::visualize(Node *tempNode = nullptr)
 
     if (minNode != nullptr)
     {
+        cout << "Main Node are as follows" << endl;
+
         do
         {
             cout << "Value->" << tempNode->key << endl;
             cout << "current address->" << tempNode << endl;
-            cout << "Previous->" << tempNode->prev << endl;
-            cout << "Next->" << tempNode->next << endl;
+            cout << "Previous->" << tempNode->prev->key << endl;
+            cout << "Next->" << tempNode->next->key << endl;
             cout << endl;
-            tempNode = tempNode->next;
             if (tempNode->child != nullptr)
                 printChild(tempNode->child);
+            tempNode = tempNode->next;
         } while (tempNode != minNode);
     }
     else
@@ -233,8 +275,8 @@ void FibonacciHeap::printChild(Node *tempNode)
     {
         cout << "Value->" << tempNode->key << endl;
         cout << "current address->" << tempNode << endl;
-        cout << "Previous->" << tempNode->prev << endl;
-        cout << "Next->" << tempNode->next << endl;
+        cout << "Previous->" << tempNode->prev->key << endl;
+        cout << "Next->" << tempNode->next->key << endl;
         cout << endl;
         if (tempNode->child != nullptr)
             printChild(tempNode->child);
@@ -244,22 +286,45 @@ void FibonacciHeap::printChild(Node *tempNode)
 
 int main()
 {
-    FibonacciHeap fibHeap;
+    FibonacciHeap fibHeap1;
+    FibonacciHeap fibHeap2;
 
-    fibHeap.insert(5);
-    fibHeap.insert(3);
-    fibHeap.insert(8);
-    fibHeap.insert(49);
-    fibHeap.insert(79);
-
-    Node *minN = fibHeap.extractMin();
+    fibHeap1.insert(5);
+    fibHeap1.insert(3);
+    fibHeap1.insert(8);
+    fibHeap1.insert(49);
+    fibHeap1.insert(79);
+    fibHeap1.insert(15);
+    fibHeap1.insert(33);
+    fibHeap1.insert(84);
+    fibHeap1.insert(1);
+    fibHeap1.insert(790);
+    Node *minN = fibHeap1.extractMin();
     if (minN != nullptr)
     {
         cout << "Min: " << minN->key << endl;
         delete minN;
     }
+    cout << endl;
+    fibHeap1.visualize();
 
-    fibHeap.visualize();
+
+    fibHeap2.insert(10);
+    fibHeap2.insert(7);
+    fibHeap2.insert(310);
+    fibHeap2.insert(90);
+    fibHeap2.insert(90);
+
+    minN = fibHeap2.extractMin();
+    if (minN != nullptr)
+    {
+        cout << "Min: " << minN->key << endl;
+        delete minN;
+    }
+    cout << endl;
+
+    fibHeap1.unionFibonacciHeap(fibHeap2);
+    fibHeap1.visualize();
 
     return 0;
 }
