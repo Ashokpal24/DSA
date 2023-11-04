@@ -8,7 +8,9 @@
     "unordered_map": "cpp",
     "vector": "cpp",
     "cmath": "cpp",
-    "ostream": "cpp"
+    "ostream": "cpp",
+    "unordered_set": "cpp",
+    "new": "cpp"
   },
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
