@@ -277,6 +277,8 @@ void FibonacciHeap::cut(Node *x_child, Node *y_parent)
     }
 
     y_parent->degree--;
+
+    // make the child a part of root list
     x_child->prev = minNode;
     x_child->next = minNode->next;
     minNode->next->prev = x_child;
@@ -392,9 +394,11 @@ int main()
     fibHeap1.unionFibonacciHeap(fibHeap2);
     // fibHeap1.visualize();
 
-    Node *nodeToDecrease = fibHeap1.minNode;
+    Node *nodeToDecrease = fibHeap1.minNode->next->child;
     if (nodeToDecrease != nullptr)
     {
+        cout << endl;
+        cout << "Before decrease Key: " << nodeToDecrease->key << endl;
         fibHeap1.decreaseKey(nodeToDecrease, 2);
         cout << "Decreased Key: " << nodeToDecrease->key << endl;
     }
@@ -403,6 +407,8 @@ int main()
     Node *nodeToDelete = fibHeap1.minNode;
     if (nodeToDelete != nullptr)
     {
+        cout << endl;
+        cout << "Before delete Key: " << nodeToDelete->key << endl;
         fibHeap1.deleteNode(nodeToDelete);
         cout << "Deleted Node: " << nodeToDelete->key << endl;
         delete nodeToDelete;
