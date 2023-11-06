@@ -76,10 +76,13 @@ int main()
 
     cout << "Inorder traversal ";
     inorderTraversal(root);
+    cout << endl;
 
-    cout << "\nPreorder traversal ";
+    cout << "Preorder traversal ";
     preorderTraversal(root);
+    cout << endl;
 
-    cout << "\nPostorder traversal ";
+    cout << "Postorder traversal ";
     postorderTraversal(root);
+    cout << endl;
 }
