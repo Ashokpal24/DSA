@@ -10,7 +10,8 @@
     "cmath": "cpp",
     "ostream": "cpp",
     "unordered_set": "cpp",
-    "new": "cpp"
+    "new": "cpp",
+    "variant": "cpp"
   },
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter"
