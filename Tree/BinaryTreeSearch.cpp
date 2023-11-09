@@ -24,10 +24,38 @@ public:
     Node *root = NULL;
 
     BST() {}
+    void insert(Node *node, int key);
     void newNode(int key);
     void inorderTraversal(Node *node);
     Node *minNode(Node *node);
+    Node *deleteNode(Node *node, int key);
 };
+
+void BST::insert(Node *node, int key)
+{
+    if (node->key > key)
+    {
+        if (node->left != NULL)
+        {
+            insert(node->left, key);
+        }
+        else
+        {
+            node->left = new Node(key);
+        }
+    }
+    else
+    {
+        if (node->right != NULL)
+        {
+            insert(node->right, key);
+        }
+        else
+        {
+            node->right = new Node(key);
+        }
+    }
+}
 
 void BST::newNode(int key)
 {
@@ -36,24 +64,7 @@ void BST::newNode(int key)
         root = new Node(key);
         return;
     }
-    Node *newNode = root;
-
-    if (key < newNode->key)
-    {
-        while (newNode->left != NULL)
-        {
-            newNode = newNode->left;
-        }
-        newNode->left = new Node(key);
-    }
-    else
-    {
-        while (newNode->right != NULL)
-        {
-            newNode = newNode->right;
-        }
-        newNode->right = new Node(key);
-    }
+    insert(root, key);
 }
 
 void BST::inorderTraversal(Node *node)
@@ -80,16 +91,43 @@ Node *BST::minNode(Node *node)
     return curr;
 }
 
-// 18
-// l->1
-// 1
-// r->10
-// 10
-// l->9
-// 9
-// l->2
+Node *BST::deleteNode(Node *node, int key)
+{
+    if (node == NULL)
+        return node;
 
-// r-98
+    if (key < node->key)
+    {
+        node->left = deleteNode(node->left, key);
+    }
+    else if (key > node->key)
+    {
+        node->right = deleteNode(node->right, key);
+    }
+    else
+    {
+        if (node->left == NULL)
+        {
+            Node *temp = node->right;
+            free(node);
+            return temp;
+        }
+        if (node->right == NULL)
+        {
+            Node *temp = node->left;
+            free(node);
+            return temp;
+        }
+
+        Node *temp = minNode(node->right);
+
+        node->key = temp->key;
+
+        node->right = deleteNode(node->right, temp->key);
+    }
+    return node;
+}
+
 int main()
 {
     BST newBST;
@@ -104,4 +142,8 @@ int main()
     cout << endl;
 
     cout << "Min Value: " << newBST.minNode(newBST.root)->key << endl;
+    cout << "\nAfter deleting\n";
+    newBST.deleteNode(newBST.root, 10);
+    newBST.inorderTraversal(newBST.root);
+    cout << endl;
 }
